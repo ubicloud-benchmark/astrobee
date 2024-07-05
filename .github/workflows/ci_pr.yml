@@ -1,20 +1,39 @@
 name: Build and Test CI for Pull Requests
 
 on:
-  pull_request:
-    branches: [ 'master', 'develop' ]
+  # push:
+  #   branches: [ 'master', 'develop' ]
   workflow_dispatch:
+  # schedule:
+  #   - cron:  '0 3 * * 1'
 
 jobs:
 
   build-focal:
-
-    runs-on: ubuntu-20.04
+    name: ${{ matrix.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        runner:
+          - ubuntu-20.04
+          - ubuntu-22.04
+          - ubicloud-standard-2
+          - ubicloud-standard-4
+          - ubicloud-standard-8
+          - ubicloud-standard-16
+          - ubicloud-standard-30
+          - ubicloud-standard-2-ubuntu-2404
+          - ubicloud-standard-4-ubuntu-2404
+          - ubicloud-standard-8-ubuntu-2404
+    runs-on: ${{ matrix.runner }}
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         fetch-depth: 0
+
+    - name: Show cpu info
+      run: lscpu
 
     - name: Checkout submodule
       run: git submodule update --init --depth 1 description/media
